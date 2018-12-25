@@ -1,4 +1,5 @@
 *~
+.aws_service_settings
 __pycache__
 deploy.zip
-venv
+venv/

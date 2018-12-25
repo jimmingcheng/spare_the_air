@@ -1,3 +1,5 @@
+include .aws_service_settings
+
 venv: requirements.txt
 	rm -rf venv
 	virtualenv -p python3.6 venv
@@ -10,7 +12,10 @@ test: venv
 .PHONY: deploy
 deploy: clean
 	zip -r deploy.zip spare_the_air/ lambda_function.py
-	aws lambda update-function-code --region us-west-2 --function-name spare_the_air --zip-file 'fileb://deploy.zip'
+	aws lambda update-function-code \
+	--function-name $(ALEXA_FUNC_NAME) \
+	--region $(ALEXA_REGION) \
+	--zip-file 'fileb://build/deploy.zip'
 
 .PHONY: clean
 clean:

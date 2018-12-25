@@ -4,10 +4,12 @@ from spare_the_air.location import sf
 def respond(event):
     request_type = event['request']['type']
 
+    print(event)
+
     if request_type == 'CanFulfillIntentRequest':
         return CanFulfillIntentRequest(event)
     elif request_type == 'LaunchRequest':
-        return respond_with_speech('Welcome to Spare the Air! ' + sf.get_burn_status())
+        return respond_with_speech(sf.get_burn_status())
     elif request_type == 'SessionEndedRequest':
         return respond_with_speech('Goodbye.')
     elif request_type == 'IntentRequest':
@@ -39,10 +41,41 @@ def GetBurnStatus():
 
 
 def CanFulfillIntentRequest(event):
-    intent_name = event['request']['intent']['name']
+    intent = event['request']['intent']
 
-    if intent_name == 'GetBurnStatus':
-        return respond_with_can_fulfill_intent({'canFulfill': 'YES'})
+    if intent['name'] == 'GetBurnStatus':
+        response = {
+            'canFulfill': 'YES',
+        }
+
+        if 'slots' in intent:
+            response['slots'] = {}
+
+            if 'Action' in intent['slots']:
+                if intent['slots']['Action']['value'] in ('burn', 'light up'):
+                    response['slots']['Action'] = {
+                        'canUnderstand': 'YES',
+                        'canFulfill': 'YES',
+                    }
+                else:
+                    response['slots']['Action'] = {
+                        'canUnderstand': 'NO',
+                        'canFulfill': 'NO',
+                    }
+
+            if 'Appliance' in intent['slots']:
+                if intent['slots']['Appliance']['value'] in ('fire', 'fireplace', 'fire pit', 'grill'):
+                    response['slots']['Appliance'] = {
+                        'canUnderstand': 'YES',
+                        'canFulfill': 'YES',
+                    }
+                else:
+                    response['slots']['Appliance'] = {
+                        'canUnderstand': 'NO',
+                        'canFulfill': 'NO',
+                    }
+
+        return respond_with_can_fulfill_intent(response)
     else:
         return respond_with_can_fulfill_intent({'canFulfill': 'NO'})
 
