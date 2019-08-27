@@ -15,7 +15,7 @@ deploy: clean
 	aws lambda update-function-code \
 	--function-name $(ALEXA_FUNC_NAME) \
 	--region $(ALEXA_REGION) \
-	--zip-file 'fileb://build/deploy.zip'
+	--zip-file 'fileb://deploy.zip'
 
 .PHONY: clean
 clean:
